@@ -14,27 +14,28 @@ var command = process.argv[2];
 
 // ------- Bands In Town -------
 
-// function bandsResponse(){
+function bandsResponse(){
 
-//     var band = process.argv[3];
+    var band = process.argv[3];
 
-//     if(!band){
-//         band = "weezer";
-//     }
+    if(!band){
+        band = "weezer";
+    }
 
-//     axios.get("http://rest.bandsintown.com/artists/" + band + "/events?app_id=codingbootcamp").then(
-//         function(response){
-//             console.log(response.data)
-//             console.log("/-------Bands-In-Town------------/");
-//             console.log("The artist name is: " + band);
-//             // console.log("The name of the venue is " + response.data.lineup);
-//             // console.log("The venue is located in " + response.data.city + "," + response.data.country);
-//             // console.log("The date of the event is " + response.data.datetime);
-//             // console.log("/--------------------------------/");
-//         })
-// }
+    axios.get("http://rest.bandsintown.com/artists/" + band + "/events?app_id=codingbootcamp").then(
+        function(response){
+            var info = response.data[0].venue
+            console.log(response.data)
+            console.log("\n/------- Bands In Town -------/\n");
+            console.log("The artist name is: " + band);
+            console.log("The name of the venue is " + info.name);
+            console.log("The venue is located in " + info.city + ", " + info.region + ", " + info.country);
+            console.log("The date of the event is " + response.data[0].datetime);
+            console.log("\n/--------------------------------/\n");
+        })
+}
 
-// bandsResponse()
+bandsResponse()
 
 
 // ------- Spotify This -------
