@@ -4,20 +4,26 @@ var keys = require("./keys.js");
 
 var fs = require("fs");
 
+var axios = require("axios");
+var moment = require('moment');
+
 var Spotify = require("node-spotify-api");
 var spotify = new Spotify(keys.spotify);
-  
-
-var axios = require("axios");
 
 var command = process.argv[2];
+var band;
+var song;
+var movie;
+var selection;
+
+
 
 
 // ------- Bands In Town ------- //
 
 function bandsResponse(){
 
-    var band = process.argv.slice(3).join(" ");
+    band = process.argv.slice(3).join(" ");
 
     if(!band){
         band = "Weezer";
@@ -28,52 +34,57 @@ function bandsResponse(){
             // debugger;
             for (var i = 0; i < response.data.length; i++){
             var info = response.data[i].venue
+            var newDate = moment(response.data[i].datetime).format("MM/DD/YYYY")
             //console.log(response.data[i])
             console.log("\n//------- Bands In Town -------//\n");
             console.log("The artist name is: " + band);
             console.log("The name of the venue is " + info.name);
             console.log("The venue is located in " + info.city + ", " + info.region + ", " + info.country);
-            console.log("The date of the event is " + response.data[i].datetime);
+            console.log("The date of the event is " + newDate);
             console.log("\n//-----------------------------//\n");
             }
         })
 }
 
-//bandsResponse()
+
 
 
 // ------- Spotify This ------- //
 
 function spotifyThis(){
 
-    var song = process.argv.slice(3).join(" ");
+    song = process.argv.slice(3).join(" ");
 
     if(!song){
-        song = "the sign";
+        song = "The Sign";
     }
-
+    
     spotify.search({ type: 'track', query: song }, function(err, data) {
         if (err) {
             return console.log('Error occurred: ' + err);
         }
-        console.log(data.tracks); 
+        debugger;
+        for (var i = 0; i < data.tracks.items.length; i++){
+        var info = data.tracks.items[i]
+        //console.log(data); 
         console.log("\n//--------------- Spotify ---------------//\n");
-        console.log("The album artist is: " + );
-        console.log("The song name is: " + );
-        console.log("Here is a link to the song on Spotify: " + );
-        console.log("The name of the album is: " + );
-        console.log("\n//----------------------------------//\n");
+        console.log("The album artist is: " + info.artists[0].name);
+        console.log("The song name is: " + info.name);
+        console.log("Here is a link to the song on Spotify: " + info.preview_url);
+        console.log("The album the song is from is: " + info.album.name);
+        console.log("\n//---------------------------------------//\n");
+        }
         });
 }
 
-//spotifyThis()
+
 
 
 // ------- Movie This ------- //
 
 function movieThis(){
 
-    var movie = process.argv.slice(3).join(" ");
+    movie = process.argv.slice(3).join(" ");
 
     if(!movie){
         movie = "mr nobody";
@@ -91,23 +102,38 @@ function movieThis(){
             console.log("The movie is in: " + omdbResponse.data.Language);
             console.log("The movie's plot is: " + omdbResponse.data.Plot);
             console.log("The actors are: " + omdbResponse.data.Actors);
-            console.log("\n//----------------------------------//\n");
+            console.log("\n//------------------------------------//\n");
     });
 }
 
-     //movieThis()
+     
 
 
 // ------- Do What It Says ------- //
 
-// function doWhatItSays(){
-//     fs.readFile("random.txt", "utf8", function(error, data){
-//         console.log(response)
-//     });
+function doWhatItSays(){
+    fs.readFile("random.txt", "utf8", function(error, data){
+        doWhatItSaysResponse = data.split(",");
+        command = doWhatItSaysResponse[0], 
+        selection = doWhatItSaysResponse[1]
+        console.log(doWhatItSaysResponse[0])
+        console.log(doWhatItSaysResponse[1])
+        
+        if (command === "concert-this"){
+            selection = band;
+            bandsResponse()
+        } else if (command === "spotify-this-song"){
+            selection = song;
+            spotifyThis();
+        } else if (command === "movie-this"){
+            movie = selection;
+            movieThis();
+        };
+    });
 
-// }
+}
 
-// doWhatItSays()
+
 
 if (command === "concert-this"){
     bandsResponse()
@@ -117,4 +143,4 @@ if (command === "concert-this"){
     movieThis();
 } else if (command === "do-what-it-says"){
     doWhatItSays();
- }
+}
